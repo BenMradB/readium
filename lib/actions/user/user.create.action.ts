@@ -8,6 +8,8 @@ export const register = async (params: RegisterParams) => {
   try {
     await connectToDatabase();
 
+    console.log("Hello From Zabourom e register");
+
     const newUser = await User.create(params);
 
     ServerActionResponse(201, "User created successfully", newUser);
