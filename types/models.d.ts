@@ -1,9 +1,9 @@
 export type TUser = {
+  clerkId: string;
   username: string;
   email: string;
   firstname: string;
   lastname: string;
-  password: string;
   avatar: string;
   followers: TUser[];
   following: TUser[];
