@@ -1,8 +1,6 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import { Tabs } from "./ui/tabs";
-import ThemeSwitcher from "./ThemeSwitcher";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 
 const Header = () => {

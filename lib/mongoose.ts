@@ -1,11 +1,12 @@
+"use server";
 import mongoose from "mongoose";
 
 let isConnected = false;
 
 export const connectToDatabase = async () => {
-  if (!process.env.MONGODB_UR) return console.error("No URL provided");
+  if (!process.env.MONGODB_URL) return console.error("No URL provided");
   const URL =
-    process.env.MONGODB_UR!.replace(
+    process.env.MONGODB_URL!.replace(
       "<password>",
       process.env.MONGODB_PASSWORD!
     ) ?? "";

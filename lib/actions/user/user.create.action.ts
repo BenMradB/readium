@@ -1,17 +1,18 @@
 "use server";
-
-import { Error } from "@/lib/error";
+import { ServerActionResponse } from "@/lib/error";
+import User from "@/lib/models/user.model";
 import { connectToDatabase } from "@/lib/mongoose";
 import { RegisterParams } from "@/types/server.actions.params";
 
 export const register = async (params: RegisterParams) => {
   try {
     await connectToDatabase();
+    const newUser = await User.create(params);
 
-    console.log("Creating user with params: ", params);
+    ServerActionResponse(201, "User created successfully", newUser);
   } catch (error: any) {
     console.log("Error creating user: ", error);
-    Error(
+    ServerActionResponse(
       500,
       "Something went very wrong while creating your account , please try later on"
     );
