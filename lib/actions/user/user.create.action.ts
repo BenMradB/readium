@@ -1,16 +1,18 @@
 "use server";
-import { ServerActionResponse } from "@/lib/error";
 import User from "@/lib/models/user.model";
+import { ServerActionResponse } from "@/lib/error";
 import { connectToDatabase } from "@/lib/mongoose";
 import { RegisterParams } from "@/types/server.actions.params";
 
 export const register = async (params: RegisterParams) => {
   try {
     await connectToDatabase();
-    console.log("HELLO FROM THE REGISTER FUNCTION");
-    const newUser = await User.create(params);
 
-    ServerActionResponse(201, "User created successfully", newUser);
+    console.log("HELLO UP THERE");
+    // console.log("HELLO FROM THE REGISTER FUNCTION");
+    // const newUser = await User.create(params);
+
+    // ServerActionResponse(201, "User created successfully", newUser);
   } catch (error: any) {
     console.log("Error creating user: ", error);
     ServerActionResponse(
