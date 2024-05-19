@@ -7,7 +7,7 @@ import { SignedIn, UserButton } from "@clerk/nextjs";
 
 const Header = () => {
   return (
-    <header className="w-full p-4 flex items-center justify-between">
+    <header className="w-full p-4 flex items-center justify-between bg-glassy ">
       <div className="flex items-center gap-x-2">
         <Image
           src="/icons/logo.svg"
@@ -19,8 +19,6 @@ const Header = () => {
         <h1 className="text-3xl md:text-4xl font-bold">Readium</h1>
       </div>
       <div className="flex items-center gap-x-2">
-        <ThemeSwitcher />
-
         <SignedIn>
           <UserButton />
         </SignedIn>

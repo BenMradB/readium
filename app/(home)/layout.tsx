@@ -1,5 +1,6 @@
 import Container from "@/components/Container";
 import Header from "@/components/Header";
+import Loader from "@/components/Loader";
 import { Metadata } from "next";
 import React, { ReactNode } from "react";
 
