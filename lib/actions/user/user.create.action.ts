@@ -7,6 +7,7 @@ import { RegisterParams } from "@/types/server.actions.params";
 export const register = async (params: RegisterParams) => {
   try {
     await connectToDatabase();
+    console.log("HELLO FROM THE REGISTER FUNCTION");
     const newUser = await User.create(params);
 
     ServerActionResponse(201, "User created successfully", newUser);
