@@ -6,8 +6,6 @@ let isConnected = false;
 export const connectToDatabase = async () => {
   if (!process.env.MONGODB_URL) return console.error("No URL provided");
 
-  console.log("HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLO");
-
   const URL =
     process.env.MONGODB_URL!.replace(
       "<password>",

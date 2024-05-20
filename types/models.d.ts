@@ -1,4 +1,5 @@
 export type TUser = {
+  _id: string;
   clerkId: string;
   username: string;
   email: string;
@@ -11,6 +12,7 @@ export type TUser = {
 };
 
 export type TStory = {
+  _id: string;
   content?: string;
   likes: TUser[];
   dislikes: TUser[];

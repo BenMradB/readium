@@ -11,4 +11,5 @@ export type CreateStoryParams = {
   content?: string;
   coverImage?: string;
   topics?: string[];
+  author: string;
 };

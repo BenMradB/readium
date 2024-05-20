@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     // Call the register function
     const res = await register(newUser);
 
-    return NextResponse.json(res);
+    return NextResponse.json({});
   }
 
   if (eventType === "user.deleted") {

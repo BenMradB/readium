@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { SignedIn, useUser } from "@clerk/nextjs";
+import { SignedIn, useClerk, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
@@ -35,20 +35,21 @@ import { createStory } from "@/lib/actions/story/create.action";
 import { CreateStoryParams } from "@/types/server.actions.params";
 import Loader from "./Loader";
 import { usePageLoader } from "@/contexts/PageLoaderProvider";
+import { TStory } from "../types/models";
 
 const Header = () => {
   const router = useRouter();
   const { user } = useUser();
-  const { isLoading, setIsLoading } = usePageLoader();
-
+  const { signOut } = useClerk();
+  const { setIsLoading } = usePageLoader();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const onCreateNewStory = async () => {
     try {
       setIsLoading(true);
-      const { statusCode, message, data } = await createStory(
-        {} as CreateStoryParams
-      );
+      const { statusCode, message, data } = await createStory({
+        author: user!.id!,
+      } as CreateStoryParams);
 
       if (statusCode !== 201) throw new Error(message);
 
@@ -56,7 +57,7 @@ const Header = () => {
 
       toast.success("Story created successfully.");
 
-      router.push(`/new-story/${data.id}`);
+      router.push(`/new-story/${(data as TStory)._id}`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -82,7 +83,7 @@ const Header = () => {
   return (
     <header className="w-full p-4 flex items-center justify-between bg-glassy gap-x-5">
       <Dialog open={openDialog} onOpenChange={() => setOpenDialog(false)}>
-        <DialogContent className="w-[95%] md:w-[85%] lg:w-[90%] mx-auto rounded-md">
+        <DialogContent className="border-2 border-black/50 w-[95%] md:w-[85%] lg:w-[90%] mx-auto rounded-md">
           <DialogHeader>
             <DialogTitle>Edit profile</DialogTitle>
             <DialogDescription>
@@ -142,10 +143,10 @@ const Header = () => {
         </Badge>
       </div>
 
-      <div className="flex items-center gap-x-5" onClick={onCreateNewStory}>
-        <Link
-          href={"/new-story"}
-          className="hidden md:flex items-center gap-x-1 group"
+      <div className="flex items-center gap-x-5">
+        <div
+          className="hidden md:flex items-center gap-x-1 group cursor-pointer"
+          onClick={onCreateNewStory}
         >
           <Image
             src={"/icons/write.svg"}
@@ -155,7 +156,7 @@ const Header = () => {
             className=""
           />
           <span className="group-hover:opacity-80">Write</span>
-        </Link>
+        </div>
         <Link
           href={"/notifications"}
           className="hidden md:flex items-center gap-x-1"
@@ -257,7 +258,20 @@ const Header = () => {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  try {
+                    setIsLoading(true);
+                    setTimeout(() => {
+                      setIsLoading(false);
+                      toast.success("Signed out successfully.");
+                    }, 3000);
+                    signOut();
+                  } catch (error: any) {
+                    toast.error(error.message);
+                  }
+                }}
+              >
                 Sign Out
                 <DropdownMenuShortcut>
                   <Image
