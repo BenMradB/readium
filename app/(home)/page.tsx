@@ -1,7 +1,7 @@
 import React from "react";
 
 const HomePage = async () => {
-  return <div className="w-full text-gradient">Home Page</div>;
+  return <div className="w-full">Home Page</div>;
 };
 
 export default HomePage;

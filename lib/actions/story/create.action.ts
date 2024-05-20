@@ -1,7 +1,7 @@
 "use server";
 
 import { CreateStoryParams } from "@/types/server.actions.params";
-import Story from "@/lib/models/blog.model";
+import Story from "@/lib/models/story.model";
 import { ServerActionResponse } from "@/lib/error";
 import { ServerActionResponseType } from "@/types/types";
 
