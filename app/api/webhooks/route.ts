@@ -2,7 +2,11 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { RegisterParams } from "@/types/server.actions.params";
-import { register } from "@/lib/actions/user/user.create.action";
+import {
+  deleteUserByClerkId,
+  register,
+} from "@/lib/actions/user/user.create.action";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
@@ -58,6 +62,8 @@ export async function POST(req: Request) {
   if (eventType === "user.created") {
     const { id, email_addresses, username, first_name, last_name, image_url } =
       evt.data;
+
+    console.log("CREATE USER EVT: ", id);
     const newUser: RegisterParams = {
       clerkId: id,
       username: username ?? `${first_name} ${last_name}`,
@@ -69,10 +75,15 @@ export async function POST(req: Request) {
 
     console.log("New User: ", newUser);
     // Call the register function
-    await register(newUser);
-  }
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-  console.log("Webhook body:", body);
+    const res = await register(newUser);
 
-  return new Response("", { status: 200 });
+    return NextResponse.json(res);
+  }
+
+  if (eventType === "user.deleted") {
+    console.log("DELETE USER EVT: ", id);
+    const res = await deleteUserByClerkId(id!);
+
+    return NextResponse.json(res);
+  }
 }
