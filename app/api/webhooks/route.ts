@@ -2,11 +2,9 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { RegisterParams } from "@/types/server.actions.params";
-import {
-  deleteUserByClerkId,
-  register,
-} from "@/lib/actions/user/user.create.action";
+import { register } from "@/lib/actions/user/user.create.action";
 import { NextResponse } from "next/server";
+import { deleteUserByClerkId } from "@/lib/actions/user/user.delete.action";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint

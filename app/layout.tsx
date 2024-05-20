@@ -1,9 +1,10 @@
-import { ThemeProvider } from "@/providers/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { PageLoaderProvider } from "@/contexts/PageLoaderProvider";
 
 const oswald = Oswald({
   subsets: ["latin"],
@@ -11,7 +12,7 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "Medium Clone",
+  title: "Readium",
   description: "A clone of Medium.com built with Next.js and Tailwind CSS. 🚀",
   icons: {
     icon: "/icons/logo.svg",
@@ -31,13 +32,17 @@ export default function RootLayout({
         },
       }}
     >
-      <html lang="en">
-        <body className={cn("bg-white dark:bg-black", oswald.className)}>
-          {/* <ThemeProvider attribute="class" defaultTheme="dark"> */}
-          {children}
-          {/* </ThemeProvider> */}
-        </body>
-      </html>
+      <PageLoaderProvider>
+        <html lang="en">
+          <body className={cn("bg-white dark:bg-black", oswald.className)}>
+            {/* <ThemeProvider attribute="class" defaultTheme="dark"> */}
+            {children}
+            <Toaster />
+
+            {/* </ThemeProvider> */}
+          </body>
+        </html>
+      </PageLoaderProvider>
     </ClerkProvider>
   );
 }

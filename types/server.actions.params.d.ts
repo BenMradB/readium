@@ -6,3 +6,9 @@ export type RegisterParams = {
   lastname: string;
   avatar: string;
 };
+
+export type CreateStoryParams = {
+  content?: string;
+  coverImage?: string;
+  topics?: string[];
+};

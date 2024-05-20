@@ -11,10 +11,10 @@ export type TUser = {
 };
 
 export type TBlog = {
-  title: string;
-  content: string;
+  content?: string;
   likes: TUser[];
   dislikes: TUser[];
   coverImage?: string;
-  tags: string[];
+  topics: string[];
+  publish: boolean;
 };
