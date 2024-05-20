@@ -61,7 +61,6 @@ export async function POST(req: Request) {
     const { id, email_addresses, username, first_name, last_name, image_url } =
       evt.data;
 
-    console.log("CREATE USER EVT: ", id);
     const newUser: RegisterParams = {
       clerkId: id,
       username: username ?? `${first_name} ${last_name}`,
@@ -71,7 +70,6 @@ export async function POST(req: Request) {
       avatar: image_url,
     };
 
-    console.log("New User: ", newUser);
     // Call the register function
     const res = await register(newUser);
 

@@ -7,10 +7,10 @@ export type TUser = {
   avatar: string;
   followers: TUser[];
   following: TUser[];
-  blogs: TBlog[];
+  stories: TStory[];
 };
 
-export type TBlog = {
+export type TStory = {
   content?: string;
   likes: TUser[];
   dislikes: TUser[];
