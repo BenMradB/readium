@@ -1,38 +1,40 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { usePageLoader } from "@/contexts/PageLoaderProvider";
-import { getUserByClerkId } from "@/lib/actions/user/user.get.action";
 import { TStory, TUser } from "@/types/models";
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { createStory } from "../../../../lib/actions/story/create.action";
 import { CreateStoryParams } from "@/types/server.actions.params";
-import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StoryCard from "@/components/StoryCard";
 import { deleteStory } from "@/lib/actions/story/delete.action";
 import { Separator } from "@/components/ui/separator";
 
-type Props = {};
+type Props = {
+  user: TUser;
+};
 
-const InitialScreen = (props: Props) => {
+const InitialStoriesScreen = ({ user }: Props) => {
   const { setIsLoading } = usePageLoader();
 
   const router = useRouter();
-  const { user } = useUser();
-  const [mongoDbUser, setMongoDbUser] = useState<TUser | null>(null);
 
-  const [draftsStories, setDraftsStories] = useState<TStory[]>([]);
-  const [publishedStories, setPublishedStories] = useState<TStory[]>([]);
+  const [draftsStories, setDraftsStories] = useState<TStory[]>(() =>
+    (user?.stories || []).filter((story) => !story.publish)
+  );
+  const [publishedStories, setPublishedStories] = useState<TStory[]>(() =>
+    (user?.stories || []).filter((story) => story.publish)
+  );
+
   const [responses, setResponses] = useState<TStory[]>([]);
 
   const onCreateNewStory = async () => {
     try {
       setIsLoading(true);
       const { statusCode, message, data } = await createStory({
-        author: user!.id!,
+        author: user._id!,
       } as CreateStoryParams);
 
       if (statusCode !== 201) throw new Error(message);
@@ -84,38 +86,9 @@ const InitialScreen = (props: Props) => {
     }
   };
 
-  useEffect(() => {
-    if (!user) return;
-    const loadUser = async () => {
-      try {
-        setIsLoading(true);
-        const { statusCode, message, data } = await getUserByClerkId(user?.id!);
-        if (statusCode !== 200) throw new Error(message);
-
-        setMongoDbUser(data as TUser);
-
-        const drafts = (data as TUser).stories.filter(
-          (story) => !story.publish
-        );
-        const published = (data as TUser).stories.filter(
-          (story) => story.publish
-        );
-
-        setDraftsStories(drafts);
-        setPublishedStories(published);
-      } catch (error: any) {
-        toast(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadUser();
-  }, [setIsLoading, user?.id, user]);
-
   return (
     <div className="w-full h-full flex gap-x-2 ">
-      <div className="w-full flex-1  flex flex-col gap-y-5 pt-20 ">
+      <div className="w-full flex-1  flex flex-col gap-y-5 pt-8 md:pt-20 ">
         <div className="w-full flex items-center justify-between">
           <h2 className="text-4xl md:text-6xl font-bold">Your stories</h2>
           <div className="flex items-center gap-x-2">
@@ -163,7 +136,7 @@ const InitialScreen = (props: Props) => {
                   >
                     read
                   </span>{" "}
-                  on Medium.
+                  on Readium.
                 </p>
               </div>
             ) : (
@@ -206,11 +179,11 @@ const InitialScreen = (props: Props) => {
           </TabsContent>
         </Tabs>
       </div>
-      <div className="w-64  max-h-screen overflow-y-auto flex-col hidden lg:flex pt-24 px-4 border-l border-black/5">
+      <div className="w-64  max-h-screen overflow-y-auto flex-col hidden lg:flex pt:8 md:pt-24 px-4 border-l border-black/5">
         <h3 className="text-xl  font-normal ">Recommended Topics</h3>
       </div>
     </div>
   );
 };
 
-export default InitialScreen;
+export default InitialStoriesScreen;
