@@ -71,15 +71,39 @@ export async function POST(req: Request) {
     };
 
     // Call the register function
-    const res = await register(newUser);
+    const { statusCode, message, data } = await register(newUser);
+    console.log(
+      "Status Code : ",
+      statusCode,
+      "Message : ",
+      message,
+      "New User : ",
+      data
+    );
 
-    return NextResponse.json({});
+    return NextResponse.json({
+      statusCode,
+      message,
+      data,
+    });
   }
 
   if (eventType === "user.deleted") {
     console.log("DELETE USER EVT: ", id);
-    const res = await deleteUserByClerkId(id!);
+    const { statusCode, message, data } = await deleteUserByClerkId(id!);
+    console.log(
+      "Status Code : ",
+      statusCode,
+      "Message : ",
+      message,
+      "New User : ",
+      data
+    );
 
-    return NextResponse.json(res);
+    return NextResponse.json({
+      statusCode,
+      message,
+      data,
+    });
   }
 }
