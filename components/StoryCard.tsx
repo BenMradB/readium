@@ -65,7 +65,7 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
                   your story
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter className="bg-black/10">
+              <AlertDialogFooter className="">
                 <AlertDialogCancel className="">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() =>

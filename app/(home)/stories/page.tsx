@@ -21,6 +21,7 @@ const StoriesPage = async () => {
   } catch (error: any) {
     console.error(error);
   }
+
   return <InitialStoriesScreen user={user} />;
 };
 

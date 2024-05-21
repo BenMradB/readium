@@ -21,20 +21,11 @@ const InitialStoriesScreen = ({ user }: Props) => {
 
   const router = useRouter();
 
-  const [draftsStories, setDraftsStories] = useState<TStory[]>(() =>
-    (user?.stories || []).filter((story) => !story.publish)
-  );
-  const [publishedStories, setPublishedStories] = useState<TStory[]>(() =>
-    (user?.stories || []).filter((story) => story.publish)
-  );
-
-  const [responses, setResponses] = useState<TStory[]>([]);
-
   const onCreateNewStory = async () => {
     try {
       setIsLoading(true);
       const { statusCode, message, data } = await createStory({
-        author: user._id!,
+        author: user.clerkId!,
       } as CreateStoryParams);
 
       if (statusCode !== 201) throw new Error(message);
@@ -62,18 +53,6 @@ const InitialStoriesScreen = ({ user }: Props) => {
       if (!data) throw new Error("Story not deleted, please try again.");
 
       setTimeout(() => {
-        if (type === "draft") {
-          const newDrafts = draftsStories.filter(
-            (draft) => draft._id !== story
-          );
-          setDraftsStories(newDrafts);
-        } else {
-          const newPublished = publishedStories.filter(
-            (published) => published._id !== story
-          );
-          setPublishedStories(newPublished);
-        }
-
         router.refresh();
         toast("Story deleted successfully");
       }, 1500);
@@ -107,9 +86,9 @@ const InitialStoriesScreen = ({ user }: Props) => {
               className="flex items-center justify-center gap-x-2"
             >
               <p>Drafts</p>
-              {draftsStories.length > 0 && (
+              {user.stories.filter((story) => !story.publish).length > 0 && (
                 <span className="text-sm bg-black text-white size-[23px] rounded-full flex items-center justify-center">
-                  {draftsStories.length}
+                  {user.stories.filter((story) => !story.publish).length}
                 </span>
               )}
             </TabsTrigger>
@@ -117,7 +96,7 @@ const InitialStoriesScreen = ({ user }: Props) => {
             <TabsTrigger value="responses">Responses</TabsTrigger>
           </TabsList>
           <TabsContent value="drafts">
-            {!draftsStories.length ? (
+            {!user.stories.filter((story) => !story.publish).length ? (
               <div className="tracking-wider w-full h-full flex flex-col items-center justify-center gap-y-4 py-10 text-center">
                 <h3 className="text-2xl md:text-3xl font-extralight">
                   You have no drafts
@@ -141,21 +120,23 @@ const InitialStoriesScreen = ({ user }: Props) => {
               </div>
             ) : (
               <div className="w-full flex flex-col">
-                {draftsStories.map((story) => (
-                  <div key={story._id}>
-                    <StoryCard
-                      story={story}
-                      onDeleteStory={onDeleteStory}
-                      type="draft"
-                    />
-                    <Separator className="bg-black/5" />
-                  </div>
-                ))}
+                {user.stories
+                  .filter((story) => !story.publish)
+                  .map((story) => (
+                    <div key={story._id}>
+                      <StoryCard
+                        story={story}
+                        onDeleteStory={onDeleteStory}
+                        type="draft"
+                      />
+                      <Separator className="bg-black/5" />
+                    </div>
+                  ))}
               </div>
             )}
           </TabsContent>
           <TabsContent value="published">
-            {!publishedStories.length ? (
+            {!user.stories.filter((story) => story.publish).length ? (
               <div className="tracking-wider w-full h-full flex flex-col items-center justify-center gap-y-4 py-10 text-center">
                 <h3 className="text-2xl md:text-3xl font-extralight">
                   You haven’t published any public stories yet.
@@ -166,7 +147,7 @@ const InitialStoriesScreen = ({ user }: Props) => {
             )}
           </TabsContent>
           <TabsContent value="responses">
-            {!responses.length ? (
+            {[].length ? (
               <div className="tracking-wider w-full h-full flex flex-col items-center justify-center gap-y-4 py-10 text-center">
                 <h3 className="text-2xl md:text-3xl font-extralight">
                   You haven’t published any public stories , so no responses

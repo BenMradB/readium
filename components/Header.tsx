@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { SignedIn, useClerk, useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import {
@@ -39,6 +39,7 @@ import { TStory } from "../types/models";
 
 const Header = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useUser();
   const { signOut } = useClerk();
   const { setIsLoading } = usePageLoader();
@@ -147,26 +148,29 @@ const Header = () => {
       </div>
 
       <div className="flex items-center gap-x-5">
-        <div
-          className="hidden md:flex items-center gap-x-1 group cursor-pointer"
-          onClick={onCreateNewStory}
-        >
-          <Image
-            src={"/icons/write.svg"}
-            alt={"write"}
-            width={20}
-            height={20}
-            className=""
-          />
-          <span className="group-hover:opacity-80">Write</span>
-        </div>
+        {!pathname.startsWith("/edit-story") ? (
+          <div
+            className="hidden md:flex items-center gap-x-1 group cursor-pointer"
+            onClick={onCreateNewStory}
+          >
+            <Image
+              src={"/icons/write.svg"}
+              alt={"write"}
+              width={20}
+              height={20}
+              className=""
+            />
+            <span className="group-hover:opacity-80">Write</span>
+          </div>
+        ) : null}
+
         <Link
           href={"/notifications"}
           className="hidden md:flex items-center gap-x-1"
         >
           <Image
             src={"/icons/notification.svg"}
-            alt={"write"}
+            alt={"notification"}
             width={24}
             height={24}
             className=""
@@ -188,20 +192,22 @@ const Header = () => {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuGroup className="md:hidden">
-                <DropdownMenuItem onClick={onCreateNewStory}>
-                  Write
-                  <DropdownMenuShortcut>
-                    <Image
-                      src={"/icons/write.svg"}
-                      alt={"write"}
-                      width={20}
-                      height={20}
-                      className=""
-                    />
-                  </DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
+              {!pathname.startsWith("/edit-story") && (
+                <DropdownMenuGroup className="md:hidden">
+                  <DropdownMenuItem onClick={onCreateNewStory}>
+                    Write
+                    <DropdownMenuShortcut>
+                      <Image
+                        src={"/icons/write.svg"}
+                        alt={"write"}
+                        width={20}
+                        height={20}
+                        className=""
+                      />
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              )}
               <DropdownMenuSeparator className="md:hidden" />
               <DropdownMenuGroup>
                 <DropdownMenuItem

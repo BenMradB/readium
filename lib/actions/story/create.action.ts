@@ -5,7 +5,7 @@ import Story from "@/lib/models/story.model";
 import { ServerActionResponse } from "@/lib/error";
 import { ServerActionResponseType } from "@/types/types";
 import { connectToDatabase } from "@/lib/mongoose";
-import { getUserByClerkId } from "../user/user.get.action";
+import { getUserByClerkId, getUserByMongoDbId } from "../user/user.get.action";
 import { TUser } from "@/types/models";
 import { pushStoryToUser } from "../user/toggle.stories.action";
 
