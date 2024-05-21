@@ -129,3 +129,13 @@
   border-radius: 0px;
   border: 3px solid black;
 }
+
+#story-title:empty:not(:focus):before {
+  content: attr(data-h1-placeholder);
+  opacity: 30%;
+}
+
+#story-content:empty:not(:focus):before {
+  content: attr(data-p-placeholder);
+  opacity: 30%;
+}

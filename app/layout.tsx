@@ -1,8 +1,10 @@
+import "./globals.css";
+import "medium-editor/dist/css/medium-editor.css";
+import "medium-editor/dist/css/themes/default.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
-import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PageLoaderProvider } from "@/contexts/PageLoaderProvider";
 
