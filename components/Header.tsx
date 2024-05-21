@@ -57,7 +57,7 @@ const Header = () => {
 
       setTimeout(() => {
         toast.success("Story created successfully.");
-        router.push(`/new-story/${(data as TStory)._id}`);
+        router.push(`/edit-story/${(data as TStory)._id}`);
       }, 1500);
     } catch (error: any) {
       toast.error(error.message);

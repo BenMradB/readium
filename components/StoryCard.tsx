@@ -31,7 +31,7 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
     <div className="w-full h-[100px] py-4 flex flex-col justify-between">
       <div className="w-full flex items-center justify-between">
         <Link
-          href={`/new-story/${story._id}`}
+          href={`/edit-story/${story._id}`}
           className="text-lg md:text-xl font-bold"
         >
           {story.content || "Untitled Story"}
@@ -39,7 +39,7 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
 
         <div className="flex items-center">
           <Button
-            onClick={() => router.push(`/new-story/${story._id}`)}
+            onClick={() => router.push(`/edit-story/${story._id}`)}
             className="group bg-transparent hover:bg-transparent size-[20px] flex-center"
           >
             <PenLineIcon
@@ -57,7 +57,7 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
                 />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="w-[90%] mx-auto rounded-sm">
+            <AlertDialogContent className="w-[90%] mx-auto rounded-sm ">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -65,7 +65,7 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
                   your story
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter className="">
+              <AlertDialogFooter className="bg-black/10">
                 <AlertDialogCancel className="">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() =>
