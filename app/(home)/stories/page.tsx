@@ -1,7 +1,8 @@
 import React from "react";
+import InitialScreen from "./_components/InitialScreen";
 
-const StoriesPage = () => {
-  return <div>StoriesPage</div>;
+const StoriesPage = async () => {
+  return <InitialScreen />;
 };
 
 export default StoriesPage;

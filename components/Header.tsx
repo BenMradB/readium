@@ -55,13 +55,16 @@ const Header = () => {
 
       if (!data) throw new Error("Story not created, please try again.");
 
-      toast.success("Story created successfully.");
-
-      router.push(`/new-story/${(data as TStory)._id}`);
+      setTimeout(() => {
+        toast.success("Story created successfully.");
+        router.push(`/new-story/${(data as TStory)._id}`);
+      }, 1500);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1500);
     }
   };
 
@@ -180,7 +183,7 @@ const Header = () => {
                   className="cursor-pointer hover:opacity-80 transition-all duration-300 ease-in-out"
                 />
                 <AvatarFallback>
-                  <Skeleton className="w-full h-full rounded-full bg-slate-300 " />
+                  <Skeleton className="w-full h-full rounded-full bg-black/5 " />
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>

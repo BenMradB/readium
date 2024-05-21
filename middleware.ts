@@ -1,10 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const protectedRoutes = createRouteMatcher(["/", "/new-tory"]);
+const publicRoutes = createRouteMatcher(["/sign-in", "/sign-up"]);
 
 export default clerkMiddleware((auth, req) => {
-  if (protectedRoutes(req)) auth().protect();
+  if (!publicRoutes(req)) auth().protect();
 });
+
 export const config = {
   matcher: ["/((?!.*..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

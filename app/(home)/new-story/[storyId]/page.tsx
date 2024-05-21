@@ -1,4 +1,5 @@
 import React from "react";
+import NewStoryForm from "./_components/NewStoryForm";
 
 type Props = {
   params: {
@@ -7,7 +8,7 @@ type Props = {
 };
 
 const NesStoryPage = ({ params }: Props) => {
-  return <div>NesStoryPage : {params.storyId} </div>;
+  return <NewStoryForm />;
 };
 
 export default NesStoryPage;

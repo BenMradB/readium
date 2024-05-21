@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import { ReactNode } from "react";
 import PageLoader from "./_components/PageLoader";
 import { Metadata } from "next";
+import InitialScreen from "./_components/InitialScreen";
 
 export const metadata: Metadata = {
   title: "Readium",
@@ -16,8 +17,9 @@ const HomeLayout = ({ children }: { children: ReactNode }) => {
   return (
     <section className="flex flex-col  w-full min-h-screen">
       <PageLoader />
-      <Header />
-      <Container>{children}</Container>
+      <InitialScreen>
+        <Container>{children}</Container>
+      </InitialScreen>
     </section>
   );
 };

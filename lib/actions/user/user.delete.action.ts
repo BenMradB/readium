@@ -17,7 +17,11 @@ export const deleteUserByClerkId = async (
       return ServerActionResponse(404, "User not found");
     }
 
-    return ServerActionResponse(200, "User deleted successfully", deletedUser);
+    return ServerActionResponse(
+      200,
+      "User deleted successfully",
+      JSON.parse(JSON.stringify(deletedUser))
+    );
   } catch (error: any) {
     return ServerActionResponse(
       500,

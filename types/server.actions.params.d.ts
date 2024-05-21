@@ -13,3 +13,8 @@ export type CreateStoryParams = {
   topics?: string[];
   author: string;
 };
+
+export type ToggleStoriesParams = {
+  storyId: string;
+  userId: string;
+};

@@ -13,7 +13,11 @@ export const register = async (
 
     const newUser = await User.create(params);
 
-    return ServerActionResponse(201, "User created successfully", newUser);
+    return ServerActionResponse(
+      201,
+      "User created successfully",
+      JSON.parse(JSON.stringify(newUser))
+    );
   } catch (error: any) {
     console.log("Error creating user: ", error);
     return ServerActionResponse(

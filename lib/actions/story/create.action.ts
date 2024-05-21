@@ -7,6 +7,7 @@ import { ServerActionResponseType } from "@/types/types";
 import { connectToDatabase } from "@/lib/mongoose";
 import { getUserByClerkId } from "../user/user.get.action";
 import { TUser } from "@/types/models";
+import { pushStoryToUser } from "../user/toggle.stories.action";
 
 export const createStory = async (
   params: CreateStoryParams
@@ -25,7 +26,16 @@ export const createStory = async (
       author: (user as TUser)._id,
     });
 
-    return ServerActionResponse(201, "Story created", newStory);
+    await pushStoryToUser({
+      userId: (user as TUser)._id,
+      storyId: newStory._id,
+    });
+
+    return ServerActionResponse(
+      201,
+      "Story created",
+      JSON.parse(JSON.stringify(newStory))
+    );
   } catch (error: any) {
     console.log("createStory error : ", error);
     return ServerActionResponse(500, "Internal Server Error");

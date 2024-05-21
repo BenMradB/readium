@@ -16,7 +16,10 @@ export type TStory = {
   content?: string;
   likes: TUser[];
   dislikes: TUser[];
+  author: TUser;
   coverImage?: string;
   topics: string[];
   publish: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
