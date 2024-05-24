@@ -28,14 +28,22 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
   const router = useRouter();
 
   return (
-    <div className="w-full h-[100px] py-4 flex flex-col justify-between">
+    <div className="w-full h-[130px] py-4 flex flex-col justify-between">
       <div className="w-full flex items-center justify-between">
-        <Link
-          href={`/edit-story/${story._id}`}
-          className="text-lg md:text-xl font-bold"
-        >
-          {story.content || "Untitled Story"}
-        </Link>
+        {story.content ? (
+          <Link
+            href={`/edit-story/${story._id}`}
+            dangerouslySetInnerHTML={{ __html: story.content }}
+            className="text-lg md:text-xl font-bold line-clamp-1"
+          ></Link>
+        ) : (
+          <Link
+            href={`/edit-story/${story._id}`}
+            className="text-lg md:text-xl font-bold"
+          >
+            Untitled Story
+          </Link>
+        )}
 
         <div className="flex items-center">
           <Button

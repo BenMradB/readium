@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Braces, GripHorizontal, Image, Plus, Video } from "lucide-react";
+import { Check, CircleCheck, Loader2, Plus } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import MediumEditor from "medium-editor";
@@ -19,33 +19,20 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { CodeBlock, Divider, ImageComponent, tools } from "./Tools";
+import { toast } from "sonner";
+import { saveStoryContent } from "@/lib/actions/story/save.action";
+import { TStory } from "@/types/models";
 
-const tools = [
-  {
-    description: "Add an image",
-    Icon: Image,
-    type: "image",
-  },
-  {
-    description: "Add a video",
-    Icon: Video,
-    type: "video",
-  },
-  {
-    description: "Add a code block",
-    Icon: Braces,
-    type: "code",
-  },
-  {
-    description: "Add a divider",
-    Icon: GripHorizontal,
-    type: "divider",
-  },
-];
-
-type Props = {};
-
-const Tools = () => {
+const Tools = ({
+  onFileChangeHandler,
+  onAddDividerHandler,
+  onAddCodeBlockHandler,
+}: {
+  onFileChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onAddDividerHandler: () => void;
+  onAddCodeBlockHandler: () => void;
+}) => {
   return (
     <>
       {tools.map(({ description, Icon, type }, index) => (
@@ -75,10 +62,23 @@ const Tools = () => {
                       type="file"
                       accept="image/*"
                       className="hidden"
+                      onChange={onFileChangeHandler}
                     />
                   </div>
                 ) : (
-                  <Icon size={20} className="text-green-700" />
+                  <Icon
+                    size={20}
+                    className="text-green-700"
+                    onClick={() => {
+                      if (type === "divider") {
+                        onAddDividerHandler();
+                      } else if (type === "code") {
+                        onAddCodeBlockHandler();
+                      } else {
+                        console.log("Not implemented yet");
+                      }
+                    }}
+                  />
                 )}
               </motion.div>
             </TooltipTrigger>
@@ -95,36 +95,138 @@ const Tools = () => {
   );
 };
 
-const NewStoryForm = (props: Props) => {
+type ToolStateType = {
+  type: string;
+  divider?: {
+    id: string;
+  };
+
+  image?: {
+    id: string;
+    imageUrl: string;
+    file: File;
+  };
+  blockOfCode?: {
+    id: string;
+    code: string;
+    language: "javascript" | "python" | "java";
+  };
+  videos?: string;
+};
+
+type Props = {
+  story: TStory;
+};
+
+const NewStoryForm = ({ story }: Props) => {
   const contentEditableRef = useRef<HTMLDivElement>(null);
 
+  const [addedTools, setAddedTools] = useState<ToolStateType[]>([]);
+
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isToolsOpen, setIsToolsOpen] = useState<boolean>(false);
   const [buttonToolsPosition, setButtonToolsPosition] = useState<{
     top: number;
     left: number;
   }>({ top: 0, left: 0 });
 
-  const getCaretPosition = (event: KeyboardEvent) => {
+  const onSaveContentHandler = async () => {
+    try {
+      setIsSaving(true);
+      const content = contentEditableRef.current?.innerHTML;
+
+      const { statusCode, message, data } = await saveStoryContent(
+        story._id!,
+        content || ""
+      );
+
+      if (statusCode !== 200) {
+        throw new Error(message);
+      }
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const onFileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    let currentImageUrl = URL.createObjectURL(file);
+
+    setAddedTools((prev: ToolStateType[]) => [
+      ...prev,
+      {
+        type: "image",
+        image: {
+          id: crypto.randomUUID(),
+          imageUrl: currentImageUrl,
+          file,
+        },
+      },
+    ]);
+  };
+
+  const onAddDividerHandler = () => {
+    setAddedTools((prev: ToolStateType[]) => [
+      ...prev,
+      {
+        type: "divider",
+        divider: {
+          id: crypto.randomUUID(),
+        },
+      },
+    ]);
+  };
+
+  const onAddCodeBlockHandler = () => {
+    setAddedTools((prev: ToolStateType[]) => [
+      ...prev,
+      {
+        type: "code",
+        blockOfCode: {
+          id: crypto.randomUUID(),
+          code: "",
+          language: "javascript",
+        },
+      },
+    ]);
+  };
+
+  const getCaretPosition = (): { top: number; left: number } => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0).cloneRange();
       const rect = range.getBoundingClientRect();
+
       if (rect.top > 0) {
         setButtonToolsPosition({
-          top: rect.top - 80, // use rect.bottom to align with the new line
-          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY - 100,
+          left: rect.left + window.screenX,
         });
       }
+      return {
+        top: rect.top,
+        left: rect.left + window.scrollX,
+      };
     }
+
+    return {
+      top: 0,
+      left: 0,
+    };
   };
 
   useEffect(() => {
-    contentEditableRef.current?.addEventListener("keydown", getCaretPosition);
+    const handleInput = () => {
+      getCaretPosition();
+      onSaveContentHandler();
+    };
+    contentEditableRef.current?.addEventListener("input", handleInput);
     return () => {
-      contentEditableRef.current?.removeEventListener(
-        "keydown",
-        getCaretPosition
-      );
+      contentEditableRef.current?.removeEventListener("input", handleInput);
     };
   }, []);
 
@@ -231,57 +333,112 @@ const NewStoryForm = (props: Props) => {
   }, []);
 
   return (
-    <div className="w-[80%]  mx-auto relative mt-14 md:mt-20">
-      <Popover onOpenChange={() => setIsToolsOpen((prev) => !prev)}>
-        <PopoverTrigger
-          asChild
-          className={cn("absolute left-0")}
+    <div className="w-[80%]  mx-auto ">
+      <div className="w-full px-8 md:px-12 py-6 flex items-center justify-between">
+        <div className="w-fit rounded-full flex items-center gap-x-1 text-gray-400 shadow-lg px-4 py-1">
+          {isSaving ? (
+            <>
+              <span className="">saving</span>
+              <Loader2 size={15} className="animate-spin" />
+            </>
+          ) : (
+            <>
+              <span className="">saved</span>
+              <CircleCheck size={15} className="" />
+            </>
+          )}
+        </div>
+        <Button className="text-white md:p-0 md:w-[200px] rounded-full focus-within:ring-0 focus-within:ring-offset-0 focus:outline-none bg-green-600 hover:bg-green-700 transition-all duration-300 ease-in-out">
+          Publish
+        </Button>
+      </div>
+      <div className="w-full relative mt-14 md:mt-20">
+        <Popover
+          open={isToolsOpen}
+          onOpenChange={() => setIsToolsOpen((prev) => !prev)}
+        >
+          <PopoverTrigger
+            asChild
+            className={cn("absolute left-0")}
+            style={{
+              top: buttonToolsPosition.top - 60,
+            }}
+          >
+            <Button
+              id="tooltip"
+              className={cn(
+                "border bg-transparent hover:bg-black/5 border-gray-700 text-gray-700 size-[40px] p-0 rounded-full flex items-center justify-center"
+              )}
+            >
+              <Plus
+                size={25}
+                className={cn(
+                  "transition-all duration-300 ease-linear",
+                  isToolsOpen ? "rotate-45" : ""
+                )}
+              />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-fit  bg-white shadow-sm border p-1 rounded-full  flex items-center gap-x-2"
+            side="right"
+          >
+            <Tools
+              onFileChangeHandler={onFileChangeHandler}
+              onAddDividerHandler={onAddDividerHandler}
+              onAddCodeBlockHandler={onAddCodeBlockHandler}
+            />
+          </PopoverContent>
+        </Popover>
+        <div
+          id="editable"
+          ref={contentEditableRef}
+          className="prose !max-w-full outline-none focus:outline-none editable w-full pl-12"
+          contentEditable
+          suppressContentEditableWarning
           style={{
-            top: buttonToolsPosition.top,
+            whiteSpace: "pre-line",
           }}
         >
-          <Button
-            id="tooltip"
-            className={cn(
-              "border bg-transparent hover:bg-black/5 border-gray-700 text-gray-700 size-[40px] p-0 rounded-full flex items-center justify-center"
-            )}
-          >
-            <Plus
-              size={25}
-              className={cn(
-                "transition-all duration-300 ease-linear",
-                isToolsOpen ? "rotate-45" : ""
-              )}
-            />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-80  bg-transparent border-none shadow-none flex items-center gap-x-2"
-          side="right"
-        >
-          <Tools />
-        </PopoverContent>
-      </Popover>
-      <div
-        id="editable"
-        ref={contentEditableRef}
-        className="prose outline-none focus:outline-none editable w-full pl-12"
-        contentEditable
-        suppressContentEditableWarning
-        style={{
-          whiteSpace: "pre-line",
-        }}
-      >
-        <h1
-          id="story-title"
-          className="font-bold text-3xl md:text-5xl w-full"
-          data-h1-placeholder="Title"
-        ></h1>
-        <p
-          id="story-content"
-          data-p-placeholder="Tell your story ..."
-          className="font-normal text-lg md:text-xl pl-4"
-        ></p>
+          {story && story.content ? (
+            <div dangerouslySetInnerHTML={{ __html: story.content }}></div>
+          ) : (
+            <>
+              <h1
+                id="story-title"
+                className="font-bold text-3xl md:text-5xl w-full"
+                data-h1-placeholder="Title"
+              ></h1>
+              <div
+                id="story-content"
+                data-p-placeholder="Tell your story ..."
+                className="font-normal text-lg md:text-xl "
+              ></div>
+            </>
+          )}
+          {addedTools
+            ? addedTools.map((tool, index) => (
+                <div key={index}>
+                  {tool.type === "image" ? (
+                    <ImageComponent
+                      onSaveStoryContent={onSaveContentHandler}
+                      imageUrl={tool.image?.imageUrl!}
+                      file={tool.image?.file!}
+                    />
+                  ) : tool.type === "divider" ? (
+                    <Divider />
+                  ) : tool.type === "code" ? (
+                    <CodeBlock
+                      code={tool.blockOfCode?.code!}
+                      language={tool.blockOfCode!.language!}
+                    />
+                  ) : (
+                    "Other"
+                  )}
+                </div>
+              ))
+            : null}
+        </div>
       </div>
     </div>
   );
