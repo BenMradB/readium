@@ -357,43 +357,45 @@ const NewStoryForm = ({ story }: Props) => {
         </Button>
       </div>
       <div className="w-full relative mt-14 md:mt-20">
-        <Popover
-          open={isToolsOpen}
-          onOpenChange={() => setIsToolsOpen((prev) => !prev)}
-        >
-          <PopoverTrigger
-            asChild
-            className={cn("absolute left-0")}
-            style={{
-              top: buttonToolsPosition.top - 60,
-            }}
+        {buttonToolsPosition.top > 0 ? (
+          <Popover
+            open={isToolsOpen}
+            onOpenChange={() => setIsToolsOpen((prev) => !prev)}
           >
-            <Button
-              id="tooltip"
-              className={cn(
-                "border bg-transparent hover:bg-black/5 border-gray-700 text-gray-700 size-[40px] p-0 rounded-full flex items-center justify-center"
-              )}
+            <PopoverTrigger
+              asChild
+              className={cn("absolute left-0")}
+              style={{
+                top: buttonToolsPosition.top - 145,
+              }}
             >
-              <Plus
-                size={25}
+              <Button
+                id="tooltip"
                 className={cn(
-                  "transition-all duration-300 ease-linear",
-                  isToolsOpen ? "rotate-45" : ""
+                  "border bg-transparent hover:bg-black/5 border-gray-700 text-gray-700 size-[40px] p-0 rounded-full flex items-center justify-center"
                 )}
+              >
+                <Plus
+                  size={25}
+                  className={cn(
+                    "transition-all duration-300 ease-linear",
+                    isToolsOpen ? "rotate-45" : ""
+                  )}
+                />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-fit  bg-white shadow-sm border p-1 rounded-full  flex items-center gap-x-2"
+              side="right"
+            >
+              <Tools
+                onFileChangeHandler={onFileChangeHandler}
+                onAddDividerHandler={onAddDividerHandler}
+                onAddCodeBlockHandler={onAddCodeBlockHandler}
               />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-fit  bg-white shadow-sm border p-1 rounded-full  flex items-center gap-x-2"
-            side="right"
-          >
-            <Tools
-              onFileChangeHandler={onFileChangeHandler}
-              onAddDividerHandler={onAddDividerHandler}
-              onAddCodeBlockHandler={onAddCodeBlockHandler}
-            />
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
+        ) : null}
         <div
           id="editable"
           ref={contentEditableRef}
@@ -438,6 +440,11 @@ const NewStoryForm = ({ story }: Props) => {
                   ) : (
                     "Other"
                   )}
+                  <p
+                    id="story-content"
+                    data-p-placeholder="Complete your story ... "
+                    className="font-normal text-lg md:text-xl "
+                  ></p>
                 </div>
               ))
             : null}

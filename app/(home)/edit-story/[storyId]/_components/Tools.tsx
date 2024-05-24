@@ -77,11 +77,6 @@ export const ImageComponent = ({
           className="font-normal text-md md:text-md "
         ></p>
       </div>
-      <p
-        id="story-content"
-        data-p-placeholder="Complete your story ... "
-        className="font-normal text-lg md:text-xl "
-      ></p>
     </div>
   );
 };
@@ -102,12 +97,6 @@ export const Divider = () => {
           ))}
         </div>
       </div>
-
-      <p
-        id="story-content"
-        data-p-placeholder="Complete your story ... "
-        className="font-normal text-lg md:text-xl "
-      ></p>
     </div>
   );
 };
@@ -216,11 +205,6 @@ export const CodeBlock = ({
           ></div>
         </div>
       </div>
-      <p
-        id="story-content"
-        data-p-placeholder="Complete your story ... "
-        className="font-normal text-lg md:text-xl "
-      ></p>
     </div>
   );
 };

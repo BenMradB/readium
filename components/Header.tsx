@@ -85,7 +85,7 @@ const Header = () => {
     };
   }, []);
 
-  if (!user) return <Loader />;
+  if (!user) return;
 
   return (
     <header className="w-full p-4 flex items-center justify-between bg-glassy gap-x-5">
