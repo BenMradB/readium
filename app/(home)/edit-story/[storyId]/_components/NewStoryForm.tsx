@@ -338,7 +338,7 @@ const NewStoryForm = ({ story }: Props) => {
 
   return (
     <div className="w-[99%] md:w-[80%]  mx-auto ">
-      <div className="w-full px-8 md:px-12 py-6 flex items-center justify-between">
+      <div className="w-full  py-6 flex items-center justify-between">
         <div className="w-fit rounded-full flex items-center gap-x-1 text-gray-400 shadow-lg px-4 py-1">
           {isSaving ? (
             <>
@@ -425,7 +425,6 @@ const NewStoryForm = ({ story }: Props) => {
                 <div key={index}>
                   {tool.type === "image" ? (
                     <ImageComponent
-                      onSaveStoryContent={onSaveContentHandler}
                       imageUrl={tool.image?.imageUrl!}
                       file={tool.image?.file!}
                     />

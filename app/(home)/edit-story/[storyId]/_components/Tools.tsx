@@ -38,11 +38,9 @@ export const tools = [
 ];
 
 export const ImageComponent = ({
-  onSaveStoryContent,
   imageUrl,
   file,
 }: {
-  onSaveStoryContent: () => void;
   imageUrl: string;
   file: File;
 }) => {
@@ -53,9 +51,8 @@ export const ImageComponent = ({
       const formData = new FormData();
       formData.append("file", file);
       const url = await uploadToCloudinary(formData);
-      console.log();
+
       setCurrentImageUrl(url);
-      onSaveStoryContent();
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -174,12 +171,12 @@ export const CodeBlock = ({
             onChange={onChangeLanguage}
             contentEditable={false}
             className={cn(
-              "bg-white w-full px-1 py-0.5 border rounded-md focus-within:ring-0 focus-within:ring-offset-0 focus:outline-none"
+              "bg-transparent w-fit px-1 py-0.5  rounded-md focus-within:ring-0 focus-within:ring-offset-0 focus:outline-none"
             )}
           >
             <option
               value="javascript"
-              className="hover:bg-gray-200 p-2 text-md font-normal"
+              className="bg-transparent hover:bg-gray-200 p-2 text-md font-normal"
             >
               Javascript
             </option>
