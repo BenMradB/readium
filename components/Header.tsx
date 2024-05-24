@@ -85,8 +85,6 @@ const Header = () => {
     };
   }, []);
 
-  if (!user) return;
-
   return (
     <header className="w-full p-4 flex items-center justify-between bg-glassy gap-x-5">
       <Dialog open={openDialog} onOpenChange={() => setOpenDialog(false)}>

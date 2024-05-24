@@ -74,7 +74,7 @@ export const ImageComponent = ({
         <p
           id="story-content"
           data-p-placeholder="Type caption for image ... "
-          className="font-normal text-md md:text-md "
+          className="font-normal text-sm "
         ></p>
       </div>
     </div>

@@ -352,8 +352,11 @@ const NewStoryForm = ({ story }: Props) => {
             </>
           )}
         </div>
-        <Button className="text-white md:p-0 md:w-[200px] rounded-full focus-within:ring-0 focus-within:ring-offset-0 focus:outline-none bg-green-600 hover:bg-green-700 transition-all duration-300 ease-in-out">
-          Publish
+        <Button
+          onClick={() => {}}
+          className="flex items-center justify-center gap-x-2 rounded-full bg-green-700 hover:bg-green-700/95  text-white font-normal tracking-wider transition-all duration-300 ease-in-out"
+        >
+          <p>Publish Story</p>
         </Button>
       </div>
       <div className="w-full relative mt-14 md:mt-20">
@@ -409,10 +412,10 @@ const NewStoryForm = ({ story }: Props) => {
           {story && story.content ? (
             <div dangerouslySetInnerHTML={{ __html: story.content }}></div>
           ) : (
-            <>
+            <div>
               <h1
                 id="story-title"
-                className="font-bold text-3xl md:text-5xl w-full"
+                className="font-bold text-xl md:text-3xl w-full"
                 data-h1-placeholder="Title"
               ></h1>
               <div
@@ -420,7 +423,7 @@ const NewStoryForm = ({ story }: Props) => {
                 data-p-placeholder="Tell your story ..."
                 className="font-normal text-lg md:text-xl "
               ></div>
-            </>
+            </div>
           )}
           {addedTools
             ? addedTools.map((tool, index) => (

@@ -39,7 +39,7 @@ const StoryCard = ({ story, type, onDeleteStory }: Props) => {
         ) : (
           <Link
             href={`/edit-story/${story._id}`}
-            className="text-lg md:text-xl font-bold"
+            className="text-xl md:text-3xl font-bold"
           >
             Untitled Story
           </Link>
