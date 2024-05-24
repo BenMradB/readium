@@ -23,6 +23,7 @@ import { CodeBlock, Divider, ImageComponent, tools } from "./Tools";
 import { toast } from "sonner";
 import { saveStoryContent } from "@/lib/actions/story/save.action";
 import { TStory } from "@/types/models";
+import { useRouter } from "next/navigation";
 
 const Tools = ({
   onFileChangeHandler,
@@ -119,6 +120,7 @@ type Props = {
 };
 
 const NewStoryForm = ({ story }: Props) => {
+  const router = useRouter();
   const contentEditableRef = useRef<HTMLDivElement>(null);
 
   const [addedTools, setAddedTools] = useState<ToolStateType[]>([]);
@@ -143,6 +145,8 @@ const NewStoryForm = ({ story }: Props) => {
       if (statusCode !== 200) {
         throw new Error(message);
       }
+
+      router.refresh();
     } catch (error: any) {
       console.log(error.message);
       toast.error(error.message);

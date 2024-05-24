@@ -41,6 +41,7 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useUser();
+
   const { signOut } = useClerk();
   const { setIsLoading } = usePageLoader();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -83,6 +84,8 @@ const Header = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  if (!user) return <Loader />;
 
   return (
     <header className="w-full p-4 flex items-center justify-between bg-glassy gap-x-5">
@@ -127,7 +130,7 @@ const Header = () => {
 
       <div
         onClick={() => setOpenDialog((prev) => !prev)}
-        className="cursor-pointer flex-1 lg:w-[500px] border !border-input lg:flex-none  bg-glassy rounded-sm relative h-[40px]"
+        className="cursor-pointer flex-1 lg:w-[500px] border !border-input lg:flex-none  bg-glassy rounded-lg relative h-[40px]"
       >
         <Image
           src={"/icons/search.svg"}
@@ -137,7 +140,7 @@ const Header = () => {
           className="absolute top-1/2 transform -translate-y-1/2 left-2"
         />
         <Input
-          className="cursor-pointer w-full h-full rounded-none bg-slate-transparent pl-10 pr-2 font-normal border-none outline-none "
+          className=" cursor-pointer  rounded-lg w-full h-full  bg-slate-transparent pl-10 pr-2 font-normal border-none outline-none "
           placeholder="Search stories, authors, topics"
           readOnly
         />
