@@ -1,15 +1,52 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Check, CircleCheck, Loader2, Plus } from "lucide-react";
+import {
+  Check,
+  CircleCheck,
+  Loader2,
+  Plus,
+  Trash,
+  X,
+  XCircle,
+} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import MediumEditor from "medium-editor";
+
+import { z } from "zod";
+
+const formSchema = z.object({
+  topics: z.array(z.string().min(2).max(20)).min(3).max(5),
+});
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   Tooltip,
@@ -24,6 +61,9 @@ import { toast } from "sonner";
 import { saveStoryContent } from "@/lib/actions/story/save.action";
 import { TStory } from "@/types/models";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { usePageLoader } from "@/contexts/PageLoaderProvider";
+import { toggleVisibility } from "@/lib/actions/story/visibility.action";
 
 const Tools = ({
   onFileChangeHandler,
@@ -120,6 +160,7 @@ type Props = {
 };
 
 const NewStoryForm = ({ story }: Props) => {
+  const { setIsLoading } = usePageLoader();
   const router = useRouter();
   const contentEditableRef = useRef<HTMLDivElement>(null);
 
@@ -131,6 +172,37 @@ const NewStoryForm = ({ story }: Props) => {
     top: number;
     left: number;
   }>({ top: 0, left: 0 });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      topics: story.topics || [],
+    },
+  });
+
+  const { isSubmitting, isValid } = form.formState;
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true);
+      const { statusCode, message, data } = await toggleVisibility(
+        story._id!,
+        story.author._id!,
+        values.topics
+      );
+
+      if (statusCode !== 200) {
+        throw new Error(message);
+      }
+
+      router.refresh();
+      toast.success(message);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const onSaveContentHandler = async () => {
     try {
@@ -223,6 +295,44 @@ const NewStoryForm = ({ story }: Props) => {
     };
   };
 
+  const onKeyDownHandler = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    field: any
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const value = e.currentTarget.value;
+      const alreadyExists = field.value.includes(value.toLowerCase().trim());
+
+      if (value.length < 2 || value.length > 20) {
+        return form.setError("topics", {
+          type: "manual",
+          message: "Topic must be between 3 and 20 characters",
+        });
+      }
+
+      if (field.value.length >= 5) {
+        return form.setError("topics", {
+          type: "manual",
+          message: "You can only add up to 5 topics",
+        });
+      }
+
+      if (alreadyExists) {
+        return form.setError("topics", {
+          type: "manual",
+          message: "Topic already exists",
+        });
+      }
+
+      form.setValue("topics", [...field.value, value.toLowerCase().trim()]);
+
+      e.currentTarget.value = "";
+      if (form.getValues().topics.length >= 3) {
+        form.trigger();
+      }
+    }
+  };
   useEffect(() => {
     const handleInput = () => {
       getCaretPosition();
@@ -352,12 +462,93 @@ const NewStoryForm = ({ story }: Props) => {
             </>
           )}
         </div>
-        <Button
-          onClick={() => {}}
-          className="flex items-center justify-center gap-x-2 rounded-full bg-green-700 hover:bg-green-700/95  text-white font-normal tracking-wider transition-all duration-300 ease-in-out"
-        >
-          <p>Publish Story</p>
-        </Button>
+        {story.publish ? (
+          <Button
+            onClick={() => onSubmit(form.getValues())}
+            className="flex items-center justify-center gap-x-2 rounded-full bg-green-700 hover:bg-green-700/95  text-white font-normal tracking-wider transition-all duration-300 ease-in-out"
+          >
+            Make it Draft
+          </Button>
+        ) : (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {}}
+                className="flex items-center justify-center gap-x-2 rounded-full bg-green-700 hover:bg-green-700/95  text-white font-normal tracking-wider transition-all duration-300 ease-in-out"
+              >
+                Publish Story
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[90%] mx-auto md:max-w-[500px] flex flex-col gap-y-4">
+              <DialogHeader>
+                <p className="flex items-center gap-x-2 text-gray-500">
+                  Publish to :
+                  <span className="text-black font-bold">
+                    {story?.author.firstname} {story?.author.firstname}
+                  </span>
+                </p>
+              </DialogHeader>
+              <p className="font-thin text-gray-500">
+                Add topics (up to 5) so readers know what your story is about
+              </p>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="w-full space-y-8"
+                >
+                  <FormField
+                    control={form.control}
+                    name="topics"
+                    render={({ field }) => (
+                      <div>
+                        <FormItem>
+                          <FormMessage />
+
+                          <FormControl>
+                            <Input
+                              disabled={isSubmitting || field.value.length >= 5}
+                              placeholder="Add topics ..."
+                              onKeyDown={(e) => onKeyDownHandler(e, field)}
+                              className={`${
+                                field.value.length >= 5
+                                  ? "bg-input pointer-events-none"
+                                  : ""
+                              }`}
+                            />
+                          </FormControl>
+                        </FormItem>
+                        <div className="w-full flex flex-wrap gap-2 items-center mt-6">
+                          {field.value.map((topic, index) => (
+                            <div
+                              className=" relative w-fit h-fit px-4 py-2 flex items-center justify-center rounded-lg rounded-tr-none bg-input text-black font-thin lowercase"
+                              key={index}
+                            >
+                              <span className="size-[20px] cursor-pointer rounded-lg rounded-b-none bg-input absolute -top-2 right-[0.5px] flex  justify-center">
+                                <X size={12} className="text-black" />
+                              </span>
+                              <p>{topic}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  />
+                  <Button
+                    onClick={() => {}}
+                    disabled={isSubmitting || !isValid}
+                    className="flex items-center w-full justify-center gap-x-2 rounded-md bg-green-700 hover:bg-green-700/95  text-white font-normal tracking-wider transition-all duration-300 ease-in-out"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 size={15} className="text-white" />
+                    ) : (
+                      "Publish Story"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
       <div className="w-full relative mt-14 md:mt-20">
         {buttonToolsPosition.top > 0 ? (

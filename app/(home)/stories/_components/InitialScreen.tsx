@@ -143,7 +143,20 @@ const InitialStoriesScreen = ({ user }: Props) => {
                 </h3>
               </div>
             ) : (
-              <div></div>
+              <div className="w-full flex flex-col">
+                {user.stories
+                  .filter((story) => story.publish)
+                  .map((story) => (
+                    <div key={story._id}>
+                      <StoryCard
+                        story={story}
+                        onDeleteStory={onDeleteStory}
+                        type="published"
+                      />
+                      <Separator className="bg-black/5" />
+                    </div>
+                  ))}
+              </div>
             )}
           </TabsContent>
           <TabsContent value="responses">
